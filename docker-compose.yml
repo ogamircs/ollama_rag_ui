@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Remove the deploy section above if you don't have a GPU
+
+  rag-app:
+    build: .
+    container_name: pdf-rag-ui
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - MODEL_NAME=qwen3:8b
+      - EMBEDDING_MODEL=nomic-embed-text
+    volumes:
+      - ./uploads:/app/uploads
+      - ./chroma_db:/app/chroma_db
+    depends_on:
+      - ollama
+
+volumes:
+  ollama_data:
