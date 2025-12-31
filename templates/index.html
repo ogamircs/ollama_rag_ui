@@ -328,7 +328,131 @@
                 max-height: 200px;
             }
         }
+
+        /* Markdown styles for assistant messages */
+        .message.assistant .message-content h1,
+        .message.assistant .message-content h2,
+        .message.assistant .message-content h3,
+        .message.assistant .message-content h4,
+        .message.assistant .message-content h5,
+        .message.assistant .message-content h6 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+            color: #00d4ff;
+        }
+
+        .message.assistant .message-content h1:first-child,
+        .message.assistant .message-content h2:first-child,
+        .message.assistant .message-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .message.assistant .message-content h1 { font-size: 1.4em; }
+        .message.assistant .message-content h2 { font-size: 1.25em; }
+        .message.assistant .message-content h3 { font-size: 1.1em; }
+
+        .message.assistant .message-content p {
+            margin: 0.75em 0;
+        }
+
+        .message.assistant .message-content p:first-child {
+            margin-top: 0;
+        }
+
+        .message.assistant .message-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message.assistant .message-content ul,
+        .message.assistant .message-content ol {
+            margin: 0.75em 0;
+            padding-left: 1.5em;
+        }
+
+        .message.assistant .message-content li {
+            margin: 0.35em 0;
+        }
+
+        .message.assistant .message-content code {
+            background: rgba(0, 212, 255, 0.15);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #00ff88;
+        }
+
+        .message.assistant .message-content pre {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 0.75em 0;
+            overflow-x: auto;
+        }
+
+        .message.assistant .message-content pre code {
+            background: none;
+            padding: 0;
+            color: #e4e4e4;
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+
+        .message.assistant .message-content blockquote {
+            border-left: 3px solid #00d4ff;
+            margin: 0.75em 0;
+            padding: 0.5em 0 0.5em 1em;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 0 8px 8px 0;
+            color: #aaa;
+        }
+
+        .message.assistant .message-content a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+        .message.assistant .message-content a:hover {
+            text-decoration: underline;
+        }
+
+        .message.assistant .message-content hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 1em 0;
+        }
+
+        .message.assistant .message-content table {
+            border-collapse: collapse;
+            margin: 0.75em 0;
+            width: 100%;
+        }
+
+        .message.assistant .message-content th,
+        .message.assistant .message-content td {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .message.assistant .message-content th {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+        }
+
+        .message.assistant .message-content strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .message.assistant .message-content em {
+            color: #ccc;
+        }
     </style>
+    <!-- Markdown support -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -569,20 +693,36 @@
                         <details>
                             <summary>View sources (${sources.length})</summary>
                             ${sources.map(s => `
-                                <div class="source-item">${s.text}</div>
+                                <div class="source-item">${escapeHtml(s.text)}</div>
                             `).join('')}
                         </details>
                     </div>
                 `;
             }
 
+            // Use markdown rendering for assistant messages, plain text for user
+            const renderedContent = role === 'assistant'
+                ? renderMarkdown(content)
+                : escapeHtml(content);
+
             messageDiv.innerHTML = `
-                <div class="message-content">${escapeHtml(content)}</div>
+                <div class="message-content">${renderedContent}</div>
                 ${sourcesHtml}
             `;
 
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function renderMarkdown(text) {
+            // Configure marked options
+            marked.setOptions({
+                breaks: true,        // Convert \n to <br>
+                gfm: true,           // GitHub Flavored Markdown
+                headerIds: false,    // Don't add IDs to headers
+                mangle: false        // Don't mangle email addresses
+            });
+            return marked.parse(text);
         }
 
         function escapeHtml(text) {
