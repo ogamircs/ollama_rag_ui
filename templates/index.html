@@ -238,6 +238,7 @@
         .message.assistant .message-content {
             background: rgba(255, 255, 255, 0.1);
             border-bottom-left-radius: 4px;
+            color: #e4e4e4;
         }
 
         .message-sources {
@@ -358,6 +359,170 @@
             color: #00ff88;
         }
 
+        /* Progress bar */
+        .progress-container {
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.indeterminate {
+            width: 30%;
+            animation: indeterminate 1.5s infinite ease-in-out;
+        }
+
+        @keyframes indeterminate {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(400%); }
+        }
+
+        /* Settings button */
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #e4e4e4;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .settings-btn:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        /* Settings modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal h3 {
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #e4e4e4;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #00d4ff;
+        }
+
+        .form-group .hint {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #888;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-save:hover {
+            transform: scale(1.02);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -413,15 +578,16 @@
 
         .message.assistant .message-content li {
             margin: 0.35em 0;
+            color: #e4e4e4;
         }
 
         .message.assistant .message-content code {
-            background: rgba(0, 212, 255, 0.15);
+            background: rgba(0, 0, 0, 0.3);
             padding: 0.2em 0.4em;
             border-radius: 4px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 0.9em;
-            color: #00ff88;
+            color: #f8c555;
         }
 
         .message.assistant .message-content pre {
@@ -447,7 +613,7 @@
             padding: 0.5em 0 0.5em 1em;
             background: rgba(0, 212, 255, 0.05);
             border-radius: 0 8px 8px 0;
-            color: #aaa;
+            color: #c0c0c0;
         }
 
         .message.assistant .message-content a {
@@ -489,7 +655,8 @@
         }
 
         .message.assistant .message-content em {
-            color: #ccc;
+            color: #b8d4e8;
+            font-style: italic;
         }
     </style>
     <!-- Markdown support -->
@@ -508,6 +675,13 @@
 
             <div id="status-bar" class="status-bar" style="display: none;"></div>
 
+            <div id="progress-container" class="progress-container">
+                <div class="progress-label" id="progress-label">Uploading...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
             <div class="documents-list" id="documents-list">
                 <!-- Documents will be populated here -->
             </div>
@@ -522,6 +696,13 @@
                         <select id="model-select">
                             <option value="">Loading models...</option>
                         </select>
+                        <button class="settings-btn" id="settings-btn" title="Chunking Settings">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"></path>
+                            </svg>
+                            Settings
+                        </button>
                     </div>
                 </div>
                 <p>Upload a PDF and ask questions about its content. Powered by Ollama.</p>
@@ -544,11 +725,34 @@
         </main>
     </div>
 
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <h3>Chunking Settings</h3>
+            <div class="form-group">
+                <label for="chunk-size">Chunk Size (characters)</label>
+                <input type="number" id="chunk-size" value="500" min="100" max="2000">
+                <div class="hint">Larger chunks = more context, fewer chunks. Default: 500</div>
+            </div>
+            <div class="form-group">
+                <label for="chunk-overlap">Chunk Overlap (characters)</label>
+                <input type="number" id="chunk-overlap" value="50" min="0" max="500">
+                <div class="hint">Overlap between consecutive chunks. Default: 50</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="settings-cancel">Cancel</button>
+                <button class="btn-save" id="settings-save">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // State
         let selectedDocId = null;
         let selectedModel = null;
         let isLoading = false;
+        let chunkSize = 500;
+        let chunkOverlap = 50;
 
         // Elements
         const uploadArea = document.getElementById('upload-area');
@@ -559,6 +763,15 @@
         const messageInput = document.getElementById('message-input');
         const sendBtn = document.getElementById('send-btn');
         const modelSelect = document.getElementById('model-select');
+        const progressContainer = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressLabel = document.getElementById('progress-label');
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const chunkSizeInput = document.getElementById('chunk-size');
+        const chunkOverlapInput = document.getElementById('chunk-overlap');
+        const settingsCancel = document.getElementById('settings-cancel');
+        const settingsSave = document.getElementById('settings-save');
 
         // Upload handling
         uploadArea.addEventListener('click', () => fileInput.click());
@@ -588,16 +801,35 @@
         });
 
         async function uploadFile(file) {
-            showStatus('Uploading and processing PDF...', 'info');
+            // Show progress bar
+            progressContainer.classList.add('active');
+            progressFill.style.width = '0%';
+            progressFill.classList.remove('indeterminate');
+            progressLabel.textContent = 'Uploading PDF...';
+            statusBar.style.display = 'none';
 
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('chunk_size', chunkSize);
+            formData.append('chunk_overlap', chunkOverlap);
 
             try {
+                // Simulate upload progress
+                progressFill.style.width = '30%';
+                progressLabel.textContent = 'Uploading PDF...';
+
                 const response = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData
                 });
+
+                // Processing phase
+                progressFill.style.width = '60%';
+                progressLabel.textContent = 'Extracting text...';
+                await new Promise(r => setTimeout(r, 300));
+
+                progressFill.style.width = '80%';
+                progressLabel.textContent = 'Creating embeddings...';
 
                 if (!response.ok) {
                     const error = await response.json();
@@ -605,12 +837,22 @@
                 }
 
                 const data = await response.json();
-                showStatus(`Uploaded: ${data.filename} (${data.chunks} chunks)`, 'success');
+
+                // Complete
+                progressFill.style.width = '100%';
+                progressLabel.textContent = 'Complete!';
+
+                setTimeout(() => {
+                    progressContainer.classList.remove('active');
+                    showStatus(`Uploaded: ${data.filename} (${data.chunks} chunks)`, 'success');
+                }, 500);
+
                 selectedDocId = data.doc_id;
                 loadDocuments();
 
-                addMessage('assistant', `Document "${data.filename}" has been processed successfully. It contains ${data.chunks} text chunks. You can now ask questions about it!`);
+                addMessage('assistant', `Document "${data.filename}" has been processed successfully. It contains ${data.chunks} text chunks (chunk size: ${chunkSize}, overlap: ${chunkOverlap}). You can now ask questions about it!`);
             } catch (error) {
+                progressContainer.classList.remove('active');
                 showStatus(`Error: ${error.message}`, 'error');
             }
         }
@@ -786,6 +1028,39 @@
         // Model selector handling
         modelSelect.addEventListener('change', (e) => {
             selectedModel = e.target.value;
+        });
+
+        // Settings modal handling
+        settingsBtn.addEventListener('click', () => {
+            chunkSizeInput.value = chunkSize;
+            chunkOverlapInput.value = chunkOverlap;
+            settingsModal.classList.add('active');
+        });
+
+        settingsCancel.addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+        });
+
+        settingsSave.addEventListener('click', () => {
+            const newChunkSize = parseInt(chunkSizeInput.value);
+            const newChunkOverlap = parseInt(chunkOverlapInput.value);
+
+            if (newChunkSize >= 100 && newChunkSize <= 2000) {
+                chunkSize = newChunkSize;
+            }
+            if (newChunkOverlap >= 0 && newChunkOverlap <= 500 && newChunkOverlap < chunkSize) {
+                chunkOverlap = newChunkOverlap;
+            }
+
+            settingsModal.classList.remove('active');
+            showStatus(`Settings updated: Chunk size ${chunkSize}, Overlap ${chunkOverlap}`, 'success');
+        });
+
+        // Close modal on overlay click
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+                settingsModal.classList.remove('active');
+            }
         });
 
         async function loadModels() {

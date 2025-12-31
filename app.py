@@ -75,7 +75,11 @@ async def root():
 
 
 @app.post("/api/upload")
-async def upload_pdf(file: UploadFile = File(...)) -> DocumentInfo:
+async def upload_pdf(
+    file: UploadFile = File(...),
+    chunk_size: int = Form(500),
+    chunk_overlap: int = Form(50)
+) -> DocumentInfo:
     """Upload and process a PDF file."""
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
@@ -92,7 +96,12 @@ async def upload_pdf(file: UploadFile = File(...)) -> DocumentInfo:
 
     try:
         # Process with RAG engine
-        result = await rag_engine.add_document(str(file_path), doc_id)
+        result = await rag_engine.add_document(
+            str(file_path),
+            doc_id,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap
+        )
 
         # Store metadata
         documents_metadata[doc_id] = {

@@ -117,15 +117,21 @@ class RAGEngine:
             arr = arr / np.linalg.norm(arr)
             return arr
 
-    async def add_document(self, pdf_path: str, doc_id: str) -> dict:
+    async def add_document(
+        self,
+        pdf_path: str,
+        doc_id: str,
+        chunk_size: int = 500,
+        chunk_overlap: int = 50
+    ) -> dict:
         """Process and add a PDF document to the vector store."""
         # Extract text
         text = self.extract_text_from_pdf(pdf_path)
         if not text.strip():
             raise ValueError("Could not extract text from PDF")
 
-        # Chunk text
-        chunks = self.chunk_text(text)
+        # Chunk text with provided parameters
+        chunks = self.chunk_text(text, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 
         # Remove existing chunks for this document
         self._remove_document(doc_id)
