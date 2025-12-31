@@ -47,6 +47,7 @@ class ChatRequest(BaseModel):
     """Request model for chat endpoint."""
     message: str
     doc_id: Optional[str] = None
+    model: Optional[str] = None
 
 
 class ChatResponse(BaseModel):
@@ -118,6 +119,10 @@ async def upload_pdf(file: UploadFile = File(...)) -> DocumentInfo:
 async def chat(request: ChatRequest) -> ChatResponse:
     """Chat with the RAG system."""
     try:
+        # Use selected model if provided
+        if request.model:
+            rag_engine.model_name = request.model
+
         result = await rag_engine.query(
             question=request.message,
             doc_id=request.doc_id
@@ -159,10 +164,32 @@ async def delete_document(doc_id: str):
     raise HTTPException(status_code=404, detail="Document not found")
 
 
+@app.get("/api/models")
+async def list_models():
+    """List available Ollama models."""
+    import httpx
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(f"{OLLAMA_BASE_URL}/api/tags")
+            response.raise_for_status()
+            data = response.json()
+            models = [
+                {
+                    "name": m["name"],
+                    "size": m.get("size", 0),
+                    "modified": m.get("modified_at", "")
+                }
+                for m in data.get("models", [])
+            ]
+            return {"models": models, "current": rag_engine.model_name}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch models: {str(e)}")
+
+
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "model": MODEL_NAME}
+    return {"status": "healthy", "model": rag_engine.model_name}
 
 
 if __name__ == "__main__":

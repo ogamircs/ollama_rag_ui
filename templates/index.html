@@ -146,6 +146,13 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        .chat-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
         .chat-header h1 {
             font-size: 1.5rem;
             background: linear-gradient(90deg, #00d4ff, #00ff88);
@@ -158,6 +165,40 @@
             color: #888;
             font-size: 0.85rem;
             margin-top: 5px;
+        }
+
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .model-selector label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        #model-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #e4e4e4;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            min-width: 180px;
+            transition: border-color 0.3s ease;
+        }
+
+        #model-select:hover,
+        #model-select:focus {
+            border-color: #00d4ff;
+        }
+
+        #model-select option {
+            background: #1a1a2e;
+            color: #e4e4e4;
         }
 
         .messages {
@@ -474,8 +515,16 @@
 
         <main class="chat-area">
             <header class="chat-header">
-                <h1>PDF RAG Chat</h1>
-                <p>Upload a PDF and ask questions about its content. Powered by Qwen3:8b via Ollama.</p>
+                <div class="chat-header-top">
+                    <h1>PDF RAG Chat</h1>
+                    <div class="model-selector">
+                        <label for="model-select">Model:</label>
+                        <select id="model-select">
+                            <option value="">Loading models...</option>
+                        </select>
+                    </div>
+                </div>
+                <p>Upload a PDF and ask questions about its content. Powered by Ollama.</p>
             </header>
 
             <div class="messages" id="messages">
@@ -498,6 +547,7 @@
     <script>
         // State
         let selectedDocId = null;
+        let selectedModel = null;
         let isLoading = false;
 
         // Elements
@@ -508,6 +558,7 @@
         const messagesContainer = document.getElementById('messages');
         const messageInput = document.getElementById('message-input');
         const sendBtn = document.getElementById('send-btn');
+        const modelSelect = document.getElementById('model-select');
 
         // Upload handling
         uploadArea.addEventListener('click', () => fileInput.click());
@@ -659,7 +710,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: message,
-                        doc_id: selectedDocId
+                        doc_id: selectedDocId,
+                        model: selectedModel
                     })
                 });
 
@@ -731,7 +783,40 @@
             return div.innerHTML.replace(/\n/g, '<br>');
         }
 
+        // Model selector handling
+        modelSelect.addEventListener('change', (e) => {
+            selectedModel = e.target.value;
+        });
+
+        async function loadModels() {
+            try {
+                const response = await fetch('/api/models');
+                const data = await response.json();
+
+                modelSelect.innerHTML = '';
+
+                if (data.models && data.models.length > 0) {
+                    data.models.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.name;
+                        option.textContent = model.name;
+                        if (model.name === data.current) {
+                            option.selected = true;
+                            selectedModel = model.name;
+                        }
+                        modelSelect.appendChild(option);
+                    });
+                } else {
+                    modelSelect.innerHTML = '<option value="">No models found</option>';
+                }
+            } catch (error) {
+                console.error('Failed to load models:', error);
+                modelSelect.innerHTML = '<option value="">Failed to load models</option>';
+            }
+        }
+
         // Initial load
+        loadModels();
         loadDocuments();
     </script>
 </body>
